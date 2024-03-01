@@ -88,7 +88,7 @@ class Walklets(Estimator):
         # Altered the starting range to remove initial hops, and add max graph diameter of 19 
         self._embedding = []
         # for power in range(1, self.window_size + 1):
-         for power in range(3, 19):
+        for power in range(3, 19):
             walklets = self._select_walklets(walker.walks, power)
             model = Word2Vec(
                 walklets,
