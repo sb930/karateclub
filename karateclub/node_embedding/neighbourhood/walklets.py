@@ -54,23 +54,23 @@ class Walklets(Estimator):
         self.min_count = min_count
         self.seed = seed
 
-    # def _select_walklets(self, walks, power):
-    #     walklets = []
-    #     for walk in walks:
-    #         for step in range(power + 1):
-    #             neighbors = [n for i, n in enumerate(walk[step:]) if i % power == 0]
-    #             walklets.append(neighbors)
-    #     return walklets
-
-    # Altered walklets selection to use long range connections
     def _select_walklets(self, walks, power):
         walklets = []
         for walk in walks:
-            # Adjusting the range to consider only steps where we can extract a full-length window
-            for step in range(power, len(walk), power):
-                neighbors = [n for i, n in enumerate(walk[step - power:step + 1]) if i % power == 0]
+            for step in range(power + 1):
+                neighbors = [n for i, n in enumerate(walk[step:]) if i % power == 0]
                 walklets.append(neighbors)
         return walklets
+
+    # # Altered walklets selection to use long range connections
+    # def _select_walklets(self, walks, power):
+    #     walklets = []
+    #     for walk in walks:
+    #         # Adjusting the range to consider only steps where we can extract a full-length window
+    #         for step in range(power, len(walk), power):
+    #             neighbors = [n for i, n in enumerate(walk[step - power:step + 1]) if i % power == 0]
+    #             walklets.append(neighbors)
+    #     return walklets
 
     def fit(self, graph: nx.classes.graph.Graph):
         """
@@ -85,8 +85,10 @@ class Walklets(Estimator):
         walker.do_walks(graph)
         num_of_nodes = graph.number_of_nodes()
 
+        # Altered the starting range to remove initial hops, and add max graph diameter of 19 
         self._embedding = []
-        for power in range(1, self.window_size + 1):
+        # for power in range(1, self.window_size + 1):
+         for power in range(3, 19):
             walklets = self._select_walklets(walker.walks, power)
             model = Word2Vec(
                 walklets,
